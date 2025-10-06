@@ -2,7 +2,7 @@ import pygame
 import numpy as np
 
 pygame.init() #Initialises pygame so its functionality can be used
-
+CarImage = pygame.image.load('Car temp.png')
 
 """ Class definitions"""
 
@@ -63,7 +63,8 @@ class Car:
         self.Rotation += angle
         if self.Rotation >360:
             self.Rotation -= 360
-        pygame.transform.rotate(CarImage,angle * -1)
+        CarImage = pygame.transform.rotate(CarImage,angle * -1)
+        
 
     def display_car(self):
         screen.blit(CarImage,(self.XPos,self.YPos))
@@ -75,7 +76,7 @@ class Car:
 """ End class definitions"""
 screen = pygame.display.set_mode((800, 600)) #Creates a display window with 800 horizontal pixels and 600 vertical pixels
 Car1 = Car(100,100,0)
-CarImage = pygame.image.load('Car temp.png')
+
 
 running = True
 while running: #Infinite loop to prevent the display window from closing until the user decides to
