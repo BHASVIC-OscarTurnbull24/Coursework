@@ -59,11 +59,12 @@ class Car:
         self.XPos += self.XSpeed
         self.YPos += self.YSpeed
 
-    def rotate_car(self,angle):
+    def rotate_car(self,angle, theCarImage):
         self.Rotation += angle
         if self.Rotation >360:
             self.Rotation -= 360
-        CarImage = pygame.transform.rotate(CarImage,angle * -1)
+        theCarImage = pygame.transform.rotate(theCarImage,angle * -1)
+        return theCarImage
         
 
     def display_car(self):
@@ -84,17 +85,17 @@ while running: #Infinite loop to prevent the display window from closing until t
     for event in pygame.event.get(): #event handling
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.KEYDOWN: # This means a key has been pressed
-            if event.key == pygame.K_a: #This means it was the left arrowkey
-                Car1.rotate_car(-2)
+        if event.type == pygame.KEYDOWN: # This means any key has been pressed
+            if event.key == pygame.K_a: #This means it was the a key
+                CarImage = Car1.rotate_car(-2, CarImage)
 
-            if event.key == pygame.K_d: #This means it was the right arrowkey
-                Car1.rotate_car(2)
+            if event.key == pygame.K_d: #This means it was the d key
+                CarImage = Car1.rotate_car(2, CarImage)
 
-            if event.key == pygame.K_w: #This means it was the left arrowkey
+            if event.key == pygame.K_w: #This means it was the w key
                 Car1.set_speed(Car1.get_ResultantSpeed() + 2)
 
-            if event.key == pygame.K_s: #This means it was the right arrowkey
+            if event.key == pygame.K_s: #This means it was the s key
                 Car1.set_speed(Car1.get_ResultantSpeed() - 2)
 
 
