@@ -2,8 +2,10 @@ import pygame
 import numpy as np
 
 pygame.init() #Initialises pygame so its functionality can be used
-CarImage = pygame.image.load('Car temp.png')
-
+screen = pygame.display.set_mode((800, 600)) #Creates a display window with 800 horizontal pixels and 600 vertical pixels
+CarImage = pygame.image.load('Car temp.png') #Sets the Surface object CarImage equal to Car temp.png
+CarImage = pygame.Surface.convert_alpha(CarImage) #Converts that image so that it can contain pixel alphas
+DisplayCarImage = CarImage
 """ Class definitions"""
 
 class Car:
@@ -39,71 +41,121 @@ class Car:
     def set_speed(self,ResultantSpeed): #This method takes in a new resultant speed as a parameter and updates the ResultantSpeed attribute and then calulates the correct X and Y speeds based off the rotation
         self.ResultantSpeed = ResultantSpeed
         if self.Rotation < 90:
-            self.XSpeed = np.cos(90-self.Rotation) * ResultantSpeed
-            self.YSpeed = np.sin(90-self.Rotation) * ResultantSpeed
+            self.XSpeed = np.cos(np.radians(90-self.Rotation)) * ResultantSpeed
+            self.YSpeed = np.sin(np.radians(90-self.Rotation)) * ResultantSpeed
 
         elif self.Rotation < 180:
-            self.XSpeed = np.cos(self.Rotation-90) * ResultantSpeed
-            self.YSpeed = np.sin(self.Rotation-90) * ResultantSpeed
+            self.XSpeed = np.cos(np.radians(self.Rotation-90)) * ResultantSpeed
+            self.YSpeed = -1 * np.sin(np.radians(self.Rotation-90)) * ResultantSpeed
 
         elif self.Rotation < 270:
-            self.XSpeed = np.cos(270-self.Rotation) * ResultantSpeed
-            self.YSpeed = np.sin(270-self.Rotation) * ResultantSpeed
+            self.XSpeed = -1 * np.cos(np.radians(270-self.Rotation)) * ResultantSpeed
+            self.YSpeed = -1 * np.sin(np.radians(270-self.Rotation)) * ResultantSpeed
 
         else:
-            self.XSpeed = np.cos(self.Rotation-270) * ResultantSpeed
-            self.YSpeed = np.sin(self.Rotation-270) * ResultantSpeed
+            self.XSpeed = -1 * np.cos(np.radians(self.Rotation-270)) * ResultantSpeed
+            self.YSpeed = np.sin(np.radians(self.Rotation-270)) * ResultantSpeed
+
         
 
     def move_car(self):
-        self.XPos += self.XSpeed
-        self.YPos += self.YSpeed
+        self.XPos += self.XSpeed #update X and Y values
+        self.YPos -= self.YSpeed
+
+        #Adding boundaries to the screen
+        if self.XPos > screen.get_width() - CarImage.get_width(): 
+            self.XPos = screen.get_width() - CarImage.get_width()
+        if self.YPos > screen.get_height() - CarImage.get_height():
+            self.YPos = screen.get_height() - CarImage.get_height() 
+
+        if self.XPos<0:
+            self.XPos = 0
+        if self.YPos<0:
+            self.YPos = 0
+        
 
     def rotate_car(self,angle, theCarImage):
         self.Rotation += angle
         if self.Rotation >360:
             self.Rotation -= 360
-        theCarImage = pygame.transform.rotate(theCarImage,angle * -1)
+        if self.Rotation <0:
+            self.Rotation += 360
+        theCarImage = pygame.transform.rotate(theCarImage,(self.Rotation) * -1)
         return theCarImage
         
 
     def display_car(self):
-        screen.blit(CarImage,(self.XPos,self.YPos))
+        screen.blit(DisplayCarImage,(self.XPos,self.YPos))
     
 
 
 
 
 """ End class definitions"""
-screen = pygame.display.set_mode((800, 600)) #Creates a display window with 800 horizontal pixels and 600 vertical pixels
+
 Car1 = Car(100,100,0)
 
 
 running = True
+IsGoingUp = False
+IsGoingDown = False
+IsTurningLeft = False
+IsTurningRight = False
 while running: #Infinite loop to prevent the display window from closing until the user decides to
+    
+    if not IsGoingUp or not IsGoingDown:
+        if IsGoingUp:
+            Car1.set_speed(Car1.get_ResultantSpeed() + 0.001)
+        elif IsGoingDown:
+            Car1.set_speed(Car1.get_ResultantSpeed() - 0.001)
+
+    if not IsTurningLeft or not IsTurningRight:
+        if IsTurningLeft:
+            DisplayCarImage = Car1.rotate_car(-0.2, CarImage)
+        elif IsTurningRight:
+            DisplayCarImage = Car1.rotate_car(0.2, CarImage)
+        
+
+
 
     for event in pygame.event.get(): #event handling
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.KEYDOWN: # This means any key has been pressed
+        if event.type == pygame.KEYDOWN: # This means any key has been PRESSED
             if event.key == pygame.K_a: #This means it was the a key
-                CarImage = Car1.rotate_car(-2, CarImage)
+                IsTurningLeft = True
 
             if event.key == pygame.K_d: #This means it was the d key
-                CarImage = Car1.rotate_car(2, CarImage)
+                IsTurningRight = True
 
             if event.key == pygame.K_w: #This means it was the w key
-                Car1.set_speed(Car1.get_ResultantSpeed() + 2)
+                IsGoingUp = True
 
             if event.key == pygame.K_s: #This means it was the s key
-                Car1.set_speed(Car1.get_ResultantSpeed() - 2)
+                IsGoingDown = True
+
+            
+
+        if event.type == pygame.KEYUP: # This means any key has been LET GO OF
+            if event.key == pygame.K_a: #This means it was the a key
+                IsTurningLeft = False
+
+            if event.key == pygame.K_d: #This means it was the d key
+                IsTurningRight = False
+
+            if event.key == pygame.K_w: #This means it was the w key
+                IsGoingUp = False
+
+            if event.key == pygame.K_s: #This means it was the s key
+                IsGoingDown = False
 
 
         #end event handling
     if Car1.get_ResultantSpeed() > 0:
-        Car1.set_speed(Car1.get_ResultantSpeed() - 1)
+        Car1.set_speed(Car1.get_ResultantSpeed() - 0.0005)
     elif Car1.get_ResultantSpeed() < 0:
-        Car1.set_speed(Car1.get_ResultantSpeed() + 1)
+        Car1.set_speed(Car1.get_ResultantSpeed() + 0.0005)
+
 
 
     screen.fill((0,0,0))
