@@ -2,7 +2,7 @@ import pygame
 import numpy as np
 
 pygame.init() #Initialises pygame so its functionality can be used
-screen = pygame.display.set_mode((800, 600)) #Creates a display window with 800 horizontal pixels and 600 vertical pixels
+screen = pygame.display.set_mode((1130, 700)) #Creates a display window with 800 horizontal pixels and 600 vertical pixels
 CarImage = pygame.image.load('Car temp.png') #Sets the Surface object CarImage equal to Car temp.png
 CarImage = pygame.Surface.convert_alpha(CarImage) #Converts that image so that it can contain pixel alphas
 DisplayCarImage = CarImage
@@ -93,27 +93,31 @@ class Car:
 
 """ End class definitions"""
 
-Car1 = Car(100,100,0)
+Car1 = Car(500,350,0)
 
 
+#Definitions of global variables used in the game
 running = True
 IsGoingUp = False
 IsGoingDown = False
 IsTurningLeft = False
 IsTurningRight = False
+Friction = 0.0015
+Acceleration = 0.0005
+RotationAmount = 0.3
 while running: #Infinite loop to prevent the display window from closing until the user decides to
     
-    if not IsGoingUp or not IsGoingDown:
+    if not IsGoingUp or not IsGoingDown: #If both IsGoingUp and IsGoingDown are true, then the speed remains the same
         if IsGoingUp:
-            Car1.set_speed(Car1.get_ResultantSpeed() + 0.001)
+            Car1.set_speed(Car1.get_ResultantSpeed() + Acceleration)
         elif IsGoingDown:
-            Car1.set_speed(Car1.get_ResultantSpeed() - 0.001)
+            Car1.set_speed(Car1.get_ResultantSpeed() - Acceleration)
 
-    if not IsTurningLeft or not IsTurningRight:
+    if not IsTurningLeft or not IsTurningRight:#If both IsTurningLeft and IsTurningRight are true, then the angle remains the same
         if IsTurningLeft:
-            DisplayCarImage = Car1.rotate_car(-0.2, CarImage)
+            DisplayCarImage = Car1.rotate_car(-RotationAmount *Car1.get_ResultantSpeed(), CarImage) 
         elif IsTurningRight:
-            DisplayCarImage = Car1.rotate_car(0.2, CarImage)
+            DisplayCarImage = Car1.rotate_car(RotationAmount *Car1.get_ResultantSpeed(), CarImage)
         
 
 
@@ -151,10 +155,12 @@ while running: #Infinite loop to prevent the display window from closing until t
 
 
         #end event handling
+
+    #Adding frictional forces to the car's speed
     if Car1.get_ResultantSpeed() > 0:
-        Car1.set_speed(Car1.get_ResultantSpeed() - 0.0005)
+        Car1.set_speed(Car1.get_ResultantSpeed() - Friction * Car1.get_ResultantSpeed())
     elif Car1.get_ResultantSpeed() < 0:
-        Car1.set_speed(Car1.get_ResultantSpeed() + 0.0005)
+        Car1.set_speed(Car1.get_ResultantSpeed() + Friction)
 
 
 
