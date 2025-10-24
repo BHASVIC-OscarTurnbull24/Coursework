@@ -5,18 +5,23 @@ pygame.init() #Initialises pygame so its functionality can be used
 screen = pygame.display.set_mode((1243, 800)) #Creates a display window with 800 horizontal pixels and 600 vertical pixels
 CarImage = pygame.image.load('Car temp.png') #Sets the Surface object CarImage equal to Car temp.png
 CarImage = pygame.Surface.convert_alpha(CarImage) #Converts that image so that it can contain pixel alphas
-DisplayCarImage = CarImage
 """ Class definitions"""
 
 class Car:
 
-    def __init__(self,XPos,YPos,Rotation):
+    def __init__(self,XPos,YPos,Rotation,CarImage):
         self.XPos = XPos
         self.YPos = YPos
         self.Rotation = Rotation
         self.XSpeed = 0
         self.YSpeed = 0
         self.ResultantSpeed = 0
+        self.CarImage = CarImage
+        self.DisplayCarImage = self.CarImage
+        self.rect = self.DisplayCarImage.get_rect()
+        self.mask = pygame.mask.from_surface(self.DisplayCarImage)
+
+
         pass
 
 #Getters and setters
@@ -37,6 +42,15 @@ class Car:
     
     def get_Rotation(self): #Getter for the rotation of the car
         return self.Rotation
+    
+    def get_rect(self): #Getter for the rect of the car
+        return self.rect
+    
+    def get_mask(self): #Getter for the mask of the car
+        return self.mask
+    
+    def get_image(self): #Getter for the image of the car
+        return self.CarImage
 
     def set_speed(self,ResultantSpeed): #This method takes in a new resultant speed as a parameter and updates the ResultantSpeed attribute and then calulates the correct X and Y speeds based off the rotation
         self.ResultantSpeed = ResultantSpeed
@@ -85,15 +99,71 @@ class Car:
         
 
     def display_car(self):
-        screen.blit(DisplayCarImage,(self.XPos,self.YPos))
+        screen.blit(self.DisplayCarImage,(self.XPos,self.YPos))
     
+
+
+class Track:
+    def __init__(self,image,x,y):
+        self.TrackImage = pygame.Surface.convert_alpha(pygame.image.load(image))
+        self.XPos = x
+        self.YPos = y
+        self.TrackRect = self.TrackImage.get_rect()
+        self.TrackMask = pygame.mask.from_surface(self.TrackImage)
+
+    def get_rect(self): #Getter for the rect of the track
+        return self.Trackrect
+
+    def get_mask(self): #Getter for the mask of the track
+        return self.Trackmask
+    
+    def get_image(self): #Getter for the image of the track
+        return self.TrackImage
+
+    def get_XPos(self): #Getter for the mask of the track
+        return self.XPos
+    
+    def get_YPos(self): #Getter for the image of the track
+        return self.YPos  
+
+    def display_track(self): #Method to display the track to the screen
+        screen.blit(self.TrackImage,(self.XPos,self.YPos)) 
+        
+class FinishLine:
+    def __init__(self,image,x,y):
+        self.FinishLineImage = pygame.Surface.convert_alpha(pygame.image.load(image))
+        self.XPos = x
+        self.YPos = y
+        self.FinishLineRect = self.FinishLineImage.get_rect()
+        self.FinishLineMask = pygame.mask.from_surface(self.TFinishLineImage)
+
+    def get_rect(self): #Getter for the rect of the finish line
+        return self.FinishLinerect
+
+    def get_mask(self): #Getter for the mask of the finish line
+        return self.FinishLinemask
+    
+    def get_image(self): #Getter for the image of the finish line
+        return self.FinishLineImage
+
+    def get_XPos(self): #Getter for the mask of the finish line
+        return self.XPos
+    
+    def get_YPos(self): #Getter for the image of the finish line
+        return self.YPos   
+    
+    def display_FinishLine(self): #Method to display the finish line to the screen
+        screen.blit(self.FinishLineImage,(self.XPos,self.YPos))
+    
+            
 
 
 
 
 """ End class definitions"""
 
-Car1 = Car(500,350,0)
+Car1 = Car(500,350,0,CarImage)
+Track1 = Track("TEMP racetrack.png", 100,100)
 
 
 #Definitions of global variables used in the game
@@ -115,9 +185,9 @@ while running: #Infinite loop to prevent the display window from closing until t
 
     if not IsTurningLeft or not IsTurningRight:#If both IsTurningLeft and IsTurningRight are true, then the angle remains the same
         if IsTurningLeft:
-            DisplayCarImage = Car1.rotate_car(-RotationAmount *Car1.get_ResultantSpeed(), CarImage) 
+            DisplayCarImage = Car1.rotate_car(-RotationAmount *Car1.get_ResultantSpeed(), Car1.get_image()) 
         elif IsTurningRight:
-            DisplayCarImage = Car1.rotate_car(RotationAmount *Car1.get_ResultantSpeed(), CarImage)
+            DisplayCarImage = Car1.rotate_car(RotationAmount *Car1.get_ResultantSpeed(), Car1.get_image())
         
 
 
@@ -157,16 +227,16 @@ while running: #Infinite loop to prevent the display window from closing until t
         #end event handling
 
     #Adding frictional forces to the car's speed
-    if Car1.get_ResultantSpeed() > 0:
+    if Car1.get_ResultantSpeed() != 0:
         Car1.set_speed(Car1.get_ResultantSpeed() - Friction * Car1.get_ResultantSpeed())
-    elif Car1.get_ResultantSpeed() < 0:
-        Car1.set_speed(Car1.get_ResultantSpeed() - Friction * Car1.get_ResultantSpeed())
+    
 
 
-
-    screen.fill((0,0,0))
+    screen.fill((10,200,0))
     Car1.move_car()
+    Track1.display_track()
     Car1.display_car()
+    
     pygame.display.update()
 
 
