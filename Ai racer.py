@@ -51,6 +51,8 @@ class Car:
     
     def get_image(self): #Getter for the image of the car
         return self.CarImage
+    def set_image(self, image):
+        self.DisplayCarImage = image
 
     def set_speed(self,ResultantSpeed): #This method takes in a new resultant speed as a parameter and updates the ResultantSpeed attribute and then calulates the correct X and Y speeds based off the rotation
         self.ResultantSpeed = ResultantSpeed
@@ -167,27 +169,28 @@ Track1 = Track("TEMP racetrack.png", 100,100)
 
 
 #Definitions of global variables used in the game
+funnyMultiplier = 1.001
 running = True
 IsGoingUp = False
 IsGoingDown = False
 IsTurningLeft = False
 IsTurningRight = False
-Friction = 0.0015
-Acceleration = 0.0006
+Friction = 0.0015 * funnyMultiplier
+Acceleration = 0.0006 * funnyMultiplier
 RotationAmount = 0.37
 while running: #Infinite loop to prevent the display window from closing until the user decides to
     
     if not IsGoingUp or not IsGoingDown: #If both IsGoingUp and IsGoingDown are true, then the speed remains the same
         if IsGoingUp:
-            Car1.set_speed(Car1.get_ResultantSpeed() + Acceleration + 0.00003 * Car1.get_ResultantSpeed())
+            Car1.set_speed(funnyMultiplier * (Car1.get_ResultantSpeed() + Acceleration + 0.00003 * Car1.get_ResultantSpeed()))
         elif IsGoingDown:
-            Car1.set_speed(Car1.get_ResultantSpeed() - Acceleration - 0.00003 * Car1.get_ResultantSpeed())
+            Car1.set_speed(funnyMultiplier*(Car1.get_ResultantSpeed() - Acceleration - 0.00003 * Car1.get_ResultantSpeed()))
 
     if not IsTurningLeft or not IsTurningRight:#If both IsTurningLeft and IsTurningRight are true, then the angle remains the same
         if IsTurningLeft:
-            DisplayCarImage = Car1.rotate_car(-RotationAmount *Car1.get_ResultantSpeed(), Car1.get_image()) 
+            Car1.set_image(Car1.rotate_car(-RotationAmount *Car1.get_ResultantSpeed(), Car1.get_image())) 
         elif IsTurningRight:
-            DisplayCarImage = Car1.rotate_car(RotationAmount *Car1.get_ResultantSpeed(), Car1.get_image())
+            Car1.set_image(Car1.rotate_car(RotationAmount *Car1.get_ResultantSpeed(), Car1.get_image())) 
         
 
 
