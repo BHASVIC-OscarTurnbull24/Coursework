@@ -1,5 +1,6 @@
 import pygame
 import numpy as np
+import time
 
 pygame.init() #Initialises pygame so its functionality can be used
 screen = pygame.display.set_mode((1243, 800)) #Creates a display window with 800 horizontal pixels and 600 vertical pixels
@@ -169,22 +170,36 @@ Track1 = Track("TEMP racetrack.png", 100,100)
 
 
 #Definitions of global variables used in the game
-funnyMultiplier = 1.001
+
 running = True
 IsGoingUp = False
 IsGoingDown = False
 IsTurningLeft = False
 IsTurningRight = False
-Friction = 0.0015 * funnyMultiplier
-Acceleration = 0.0006 * funnyMultiplier
+Friction = 0.0015 
+Acceleration = 0.0006
 RotationAmount = 0.37
+startTime = time.perf_counter()
 while running: #Infinite loop to prevent the display window from closing until the user decides to
     
+    newTime = time.perf_counter()
+    
+    while True:
+        if newTime > startTime + 0.0150000:
+            break
+        newTime = time.perf_counter()
+        
+    startTime = newTime
+    
+    
+    print(startTime)
+    
+
     if not IsGoingUp or not IsGoingDown: #If both IsGoingUp and IsGoingDown are true, then the speed remains the same
         if IsGoingUp:
-            Car1.set_speed(funnyMultiplier * (Car1.get_ResultantSpeed() + Acceleration + 0.00003 * Car1.get_ResultantSpeed()))
+            Car1.set_speed((Car1.get_ResultantSpeed() + Acceleration + 0.00003 * Car1.get_ResultantSpeed()))
         elif IsGoingDown:
-            Car1.set_speed(funnyMultiplier*(Car1.get_ResultantSpeed() - Acceleration - 0.00003 * Car1.get_ResultantSpeed()))
+            Car1.set_speed((Car1.get_ResultantSpeed() - Acceleration - 0.00003 * Car1.get_ResultantSpeed()))
 
     if not IsTurningLeft or not IsTurningRight:#If both IsTurningLeft and IsTurningRight are true, then the angle remains the same
         if IsTurningLeft:
@@ -241,6 +256,7 @@ while running: #Infinite loop to prevent the display window from closing until t
     Car1.display_car()
     
     pygame.display.update()
+    
 
 
 
