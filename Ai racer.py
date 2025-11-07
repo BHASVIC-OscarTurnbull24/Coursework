@@ -158,12 +158,19 @@ class FinishLine:
     def display_FinishLine(self): #Method to display the finish line to the screen
         screen.blit(self.FinishLineImage,(self.XPos,self.YPos))
     
-            
-
-
-
 
 """ End class definitions"""
+            
+"""Global subroutines start"""
+
+def abs(number):
+    if number <0:
+        return number * -1
+    else:
+        return number
+
+""" Global subroutines end"""
+
 
 Car1 = Car(500,350,0,CarImage)
 Track1 = Track("TEMP racetrack.png", 100,100)
@@ -176,23 +183,35 @@ IsGoingUp = False
 IsGoingDown = False
 IsTurningLeft = False
 IsTurningRight = False
-Friction = 0.0015 
-Acceleration = 0.0006
-RotationAmount = 0.37
-startTime = time.perf_counter()
+Friction = 0.0095
+Acceleration = 0.055
+RotationAmount = 0.45
+StartTime = time.perf_counter()
+FrameRate = 0.0165000000
+count = 0
+total = 0
+sigmaXSquared = 0
 while running: #Infinite loop to prevent the display window from closing until the user decides to
     
     newTime = time.perf_counter()
     
     while True:
-        if newTime > startTime + 0.0150000:
+        if newTime > StartTime + FrameRate:
             break
         newTime = time.perf_counter()
-        
-    startTime = newTime
+
+    count += 1
+    total += newTime - StartTime  
+    sigmaXSquared += (newTime - StartTime) **2
+
+
+
+
+    StartTime = newTime
     
     
-    print(startTime)
+    
+    print(StartTime)
     
 
     if not IsGoingUp or not IsGoingDown: #If both IsGoingUp and IsGoingDown are true, then the speed remains the same
@@ -246,7 +265,7 @@ while running: #Infinite loop to prevent the display window from closing until t
 
     #Adding frictional forces to the car's speed
     if Car1.get_ResultantSpeed() != 0:
-        Car1.set_speed(Car1.get_ResultantSpeed() - Friction * Car1.get_ResultantSpeed())
+        Car1.set_speed(Car1.get_ResultantSpeed() - Friction *Car1.get_ResultantSpeed())
     
 
 
@@ -259,7 +278,8 @@ while running: #Infinite loop to prevent the display window from closing until t
     
 
 
-
+print("\n\n", total/count)
+print(np.sqrt(sigmaXSquared/count - (total/count)**2))
             
 pygame.quit()
 
