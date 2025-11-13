@@ -188,28 +188,37 @@ Acceleration = 0.055
 RotationAmount = 0.45
 StartTime = time.perf_counter()
 FrameRate = 0.0165000000
+'''Variables only used to test the mean and standard deviation of time between frames
 count = 0
 total = 0
 sigmaXSquared = 0
+'''
+NormalFriction = 0.0095
+OffTrackFriction = 0.0120
+
+'''Game loop'''
 while running: #Infinite loop to prevent the display window from closing until the user decides to
     
-    newTime = time.perf_counter()
+    NewTime = time.perf_counter() #newTime is set equal to the current time using the system's clock
     
-    while True:
-        if newTime > StartTime + FrameRate:
+    #Here is a loop which makes the game wait until the time defined in FrameRate has passed since the last iteration of the game loop
+    
+    while True: 
+        if NewTime > StartTime + FrameRate:
             break
-        newTime = time.perf_counter()
+        NewTime = time.perf_counter()
+    
+        
+    
+   
+    '''Code to test the mean and standard deviation of the time between frames
 
     count += 1
-    total += newTime - StartTime  
-    sigmaXSquared += (newTime - StartTime) **2
+    total += NewTime - StartTime  
+    sigmaXSquared += (NewTime - StartTime) **2
+    '''
 
-
-
-
-    StartTime = newTime
-    
-    
+    StartTime = NewTime
     
     print(StartTime)
     
@@ -271,17 +280,33 @@ while running: #Infinite loop to prevent the display window from closing until t
 
     screen.fill((10,200,0))
     Car1.move_car()
+
+
+    if pygame.sprite.spritecollide(Track, Car, False):
+
+        if pygame.sprite.spritecollide(Track,Car,False,pygame.sprite.collide_mask):
+            Friction = NormalFriction 
+    else:
+        Friction = OffTrackFriction
+        
+
+    
+    
+    
     Track1.display_track()
     Car1.display_car()
     
     pygame.display.update()
     
+'''End game loop'''
 
+'''Code to test the mean and standard deviation of the time between frames
 
-print("\n\n", total/count)
-print(np.sqrt(sigmaXSquared/count - (total/count)**2))
+print("\n\nMean = ", total/count)
+print("Standard deviation = ",np.sqrt(sigmaXSquared/count - (total/count)**2))
+'''
             
 pygame.quit()
 
 
- 
+
