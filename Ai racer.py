@@ -8,22 +8,24 @@ CarImage = pygame.image.load('Car temp.png') #Sets the Surface object CarImage e
 CarImage = pygame.Surface.convert_alpha(CarImage) #Converts that image so that it can contain pixel alphas
 """ Class definitions"""
 
-class Car:
+class Car(pygame.sprite.Sprite):
 
     def __init__(self,XPos,YPos,Rotation,CarImage):
+        pygame.sprite.Sprite.__init__(self)
         self.XPos = XPos
         self.YPos = YPos
         self.Rotation = Rotation
         self.XSpeed = 0
         self.YSpeed = 0
         self.ResultantSpeed = 0
-        self.CarImage = CarImage
+        self.CarImage = pygame.Surface.convert_alpha(CarImage)
         self.DisplayCarImage = self.CarImage
         self.rect = self.DisplayCarImage.get_rect()
+        self.rect.topleft = (self.XPos,self.YPos)
         self.mask = pygame.mask.from_surface(self.DisplayCarImage)
 
 
-        pass
+
 
 #Getters and setters
     def get_XPos(self): #Getter for the X position of the car
@@ -78,6 +80,7 @@ class Car:
     def move_car(self):
         self.XPos += self.XSpeed #update X and Y values
         self.YPos -= self.YSpeed
+        self.rect.topleft = (self.XPos,self.YPos)
 
         #Adding boundaries to the screen
         if self.XPos > screen.get_width() - CarImage.get_width(): 
@@ -98,6 +101,7 @@ class Car:
         if self.Rotation <0:
             self.Rotation += 360
         theCarImage = pygame.transform.rotate(theCarImage,(self.Rotation) * -1)
+        self.mask = pygame.mask.from_surface(self.DisplayCarImage)
         return theCarImage
         
 
@@ -106,19 +110,22 @@ class Car:
     
 
 
-class Track:
+class Track(pygame.sprite.Sprite):
     def __init__(self,image,x,y):
+        pygame.sprite.Sprite.__init__(self)
         self.TrackImage = pygame.Surface.convert_alpha(pygame.image.load(image))
         self.XPos = x
         self.YPos = y
-        self.TrackRect = self.TrackImage.get_rect()
-        self.TrackMask = pygame.mask.from_surface(self.TrackImage)
+        self.rect = self.TrackImage.get_rect()
+        self.rect.topleft = (self.XPos,self.YPos)
+        self.mask = pygame.mask.from_surface(self.TrackImage)
+        
 
     def get_rect(self): #Getter for the rect of the track
-        return self.Trackrect
+        return self.rect
 
     def get_mask(self): #Getter for the mask of the track
-        return self.Trackmask
+        return self.mask
     
     def get_image(self): #Getter for the image of the track
         return self.TrackImage
@@ -171,9 +178,15 @@ def abs(number):
 
 """ Global subroutines end"""
 
-
+#Instantiating the car and racetrack objects
 Car1 = Car(500,350,0,CarImage)
 Track1 = Track("TEMP racetrack.png", 100,100)
+
+#Creating Sprite groups
+CarGroup = pygame.sprite.Group()
+CarGroup.add(Car1)
+
+
 
 
 #Definitions of global variables used in the game
@@ -194,7 +207,7 @@ total = 0
 sigmaXSquared = 0
 '''
 NormalFriction = 0.0095
-OffTrackFriction = 0.0120
+OffTrackFriction = 1.00
 
 '''Game loop'''
 while running: #Infinite loop to prevent the display window from closing until the user decides to
@@ -220,7 +233,7 @@ while running: #Infinite loop to prevent the display window from closing until t
 
     StartTime = NewTime
     
-    print(StartTime)
+    #print(StartTime)
     
 
     if not IsGoingUp or not IsGoingDown: #If both IsGoingUp and IsGoingDown are true, then the speed remains the same
@@ -282,12 +295,14 @@ while running: #Infinite loop to prevent the display window from closing until t
     Car1.move_car()
 
 
-    if pygame.sprite.spritecollide(Track, Car, False):
-
-        if pygame.sprite.spritecollide(Track,Car,False,pygame.sprite.collide_mask):
+    #Rectangle collision detection between the track and the car
+    if pygame.sprite.spritecollide(Track1, CarGroup, False):
+        #Mask collision detection between the track and the car
+        if pygame.sprite.spritecollide(Track1, CarGroup,False,pygame.sprite.collide_mask):
             Friction = NormalFriction 
     else:
         Friction = OffTrackFriction
+        print("Yipepe")
         
 
     
