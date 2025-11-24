@@ -80,7 +80,7 @@ class Car(pygame.sprite.Sprite):
     def move_car(self):
         self.XPos += self.XSpeed #update X and Y values
         self.YPos -= self.YSpeed
-        self.rect.topleft = (self.XPos,self.YPos)
+        
 
         #Adding boundaries to the screen
         if self.XPos > screen.get_width() - CarImage.get_width(): 
@@ -92,6 +92,8 @@ class Car(pygame.sprite.Sprite):
             self.XPos = 0
         if self.YPos<0:
             self.YPos = 0
+
+        self.rect.topleft = (self.XPos,self.YPos)
         
 
     def rotate_car(self,angle, theCarImage):
@@ -101,7 +103,7 @@ class Car(pygame.sprite.Sprite):
         if self.Rotation <0:
             self.Rotation += 360
         theCarImage = pygame.transform.rotate(theCarImage,(self.Rotation) * -1)
-        self.mask = pygame.mask.from_surface(self.DisplayCarImage)
+        self.mask = pygame.mask.from_surface(theCarImage)
         return theCarImage
         
 
@@ -207,7 +209,7 @@ total = 0
 sigmaXSquared = 0
 '''
 NormalFriction = 0.0095
-OffTrackFriction = 1.00
+OffTrackFriction = 0.04
 
 '''Game loop'''
 while running: #Infinite loop to prevent the display window from closing until the user decides to
@@ -298,11 +300,14 @@ while running: #Infinite loop to prevent the display window from closing until t
     #Rectangle collision detection between the track and the car
     if pygame.sprite.spritecollide(Track1, CarGroup, False):
         #Mask collision detection between the track and the car
-        if pygame.sprite.spritecollide(Track1, CarGroup,False,pygame.sprite.collide_mask):
+        if pygame.sprite.spritecollide(Track1, CarGroup,False, pygame.sprite.collide_mask):
             Friction = NormalFriction 
+        else:
+            Friction = OffTrackFriction     
+
     else:
         Friction = OffTrackFriction
-        print("Yipepe")
+        
         
 
     
