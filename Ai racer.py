@@ -8,6 +8,9 @@ CarImage = pygame.image.load('Car temp.png') #Sets the Surface object CarImage e
 CarImage = pygame.Surface.convert_alpha(CarImage) #Converts that image so that it can contain pixel alphas
 """ Class definitions"""
 
+
+#track 1080 X 695  779 X501, finish width 125 PX 60, car 30x60
+
 class Car(pygame.sprite.Sprite):
 
     def __init__(self,XPos,YPos,Rotation,CarImage):
@@ -146,14 +149,14 @@ class FinishLine:
         self.FinishLineImage = pygame.Surface.convert_alpha(pygame.image.load(image))
         self.XPos = x
         self.YPos = y
-        self.FinishLineRect = self.FinishLineImage.get_rect()
-        self.FinishLineMask = pygame.mask.from_surface(self.TFinishLineImage)
+        self.rect = self.FinishLineImage.get_rect()
+        self.mask = pygame.mask.from_surface(self.FinishLineImage)
 
     def get_rect(self): #Getter for the rect of the finish line
-        return self.FinishLinerect
+        return self.rect
 
     def get_mask(self): #Getter for the mask of the finish line
-        return self.FinishLinemask
+        return self.mask
     
     def get_image(self): #Getter for the image of the finish line
         return self.FinishLineImage
@@ -183,6 +186,7 @@ def abs(number):
 #Instantiating the car and racetrack objects
 Car1 = Car(500,350,0,CarImage)
 Track1 = Track("TEMP racetrack.png", 100,100)
+Finishline1 = FinishLine("finishline.png", 163,400)
 
 #Creating Sprite groups
 CarGroup = pygame.sprite.Group()
@@ -315,6 +319,7 @@ while running: #Infinite loop to prevent the display window from closing until t
     
     Track1.display_track()
     Car1.display_car()
+    Finishline1.display_FinishLine()
     
     pygame.display.update()
     
