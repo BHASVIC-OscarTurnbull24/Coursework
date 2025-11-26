@@ -26,6 +26,7 @@ class Car(pygame.sprite.Sprite):
         self.rect = self.DisplayCarImage.get_rect()
         self.rect.topleft = (self.XPos,self.YPos)
         self.mask = pygame.mask.from_surface(self.DisplayCarImage)
+        self.LapCount = 0
 
 
 
@@ -112,6 +113,12 @@ class Car(pygame.sprite.Sprite):
 
     def display_car(self):
         screen.blit(self.DisplayCarImage,(self.XPos,self.YPos))
+
+    def new_lap(self, TotalLaps): #Method which increases the number of laps.  
+        self.LapCount += 1
+        if self.LapCount >= TotalLaps:
+            return False #Returns False if the max number of laps is reached so the car has won.
+        return True #Returns True if the lapCount is less than the max and the game continues.
     
 
 
@@ -150,6 +157,7 @@ class FinishLine:
         self.XPos = x
         self.YPos = y
         self.rect = self.FinishLineImage.get_rect()
+        self.rect.topleft = (self.XPos,self.YPos)
         self.mask = pygame.mask.from_surface(self.FinishLineImage)
 
     def get_rect(self): #Getter for the rect of the finish line
@@ -186,7 +194,7 @@ def abs(number):
 #Instantiating the car and racetrack objects
 Car1 = Car(500,350,0,CarImage)
 Track1 = Track("TEMP racetrack.png", 100,100)
-Finishline1 = FinishLine("finishline.png", 163,400)
+Finishline1 = FinishLine("finishline.png", 159,400)
 
 #Creating Sprite groups
 CarGroup = pygame.sprite.Group()
@@ -207,6 +215,7 @@ Acceleration = 0.055
 RotationAmount = 0.45
 StartTime = time.perf_counter()
 FrameRate = 0.0165000000
+TotalLaps = 3 #This will become a player input later
 '''Variables only used to test the mean and standard deviation of time between frames
 count = 0
 total = 0
@@ -311,6 +320,15 @@ while running: #Infinite loop to prevent the display window from closing until t
 
     else:
         Friction = OffTrackFriction
+
+    #Rectangle collision detection between the finish line and the car
+    if pygame.sprite.spritecollide(Finishline1, CarGroup, False):
+        #Mask collision detection between the finish line and the car
+        if pygame.sprite.spritecollide(Finishline1, CarGroup,False, pygame.sprite.collide_mask):
+            if not Car1.new_lap(TotalLaps):
+                #Car1 has won
+                print("The car is colliding with the finish line")
+        
         
         
 
