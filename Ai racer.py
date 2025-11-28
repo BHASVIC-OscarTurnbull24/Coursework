@@ -327,7 +327,7 @@ while running: #Infinite loop to prevent the display window from closing until t
         if pygame.sprite.spritecollide(Finishline1, CarGroup,False, pygame.sprite.collide_mask):
             if not Car1.new_lap(TotalLaps):
                 #Car1 has won
-                print("The car is colliding with the finish line")
+                print("Test passed")
         
         
         
