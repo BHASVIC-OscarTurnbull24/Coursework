@@ -3,11 +3,16 @@ import numpy as np
 import time
 #track 1080 X 695  779 X501, finish width 125 PX 60, car 30x60
 
+#Global objects and variables
+
+
 pygame.init() #Initialises pygame so its functionality can be used
 pygame.font.init()
 title_font = pygame.font.SysFont('Aptos', 120)
-body_font = pygame.font.SysFont('Aptos', 40)
+body_font = pygame.font.SysFont('Aptos', 25)
+Medium_font = pygame.font.SysFont('Aptos', 65)
 screen = pygame.display.set_mode((1243, 800)) #Creates a display window with 800 horizontal pixels and 600 vertical pixels
+TotalLaps = 1 #This will become a player input later
 
 
 #Customising pygame window
@@ -16,38 +21,215 @@ icon = pygame.image.load('Racecar.png')
 pygame.display.set_icon(icon)
 
 
+
+'''Global subroutines'''
+def abs(number):
+        if number <0:
+            return number * -1
+        else:
+            return number
+        
+def get_totalLaps():
+        return TotalLaps
+def set_totalLaps(newValue):
+    TotalLaps = newValue
+
+'''global subroutines end'''
 def menu():
     running = True
-    while running:
-        screen.fill((10,200,0))
-        title = title_font.render('Ai racer', False, (255,255,255))
-        screen.blit(title,(480,50))
-        title = body_font.render('Press S for settings, press R to start racing', False, (255,255,255))
-        screen.blit(title,(60,250))
+    class Button():
+        def __init__(self,width,height,x,y,text,XOffset,YOffset):
+            self.Width = width
+            self.Height = height
+            self.XPos = x
+            self.YPos = y
+            self.XOffset = XOffset
+            self.YOffset = YOffset
 
-        for event in pygame.event.get(): #event handling
+            self.Surface = pygame.Surface((self.Width,self.Height)) #Creates surface for the button
+            self.Rect = pygame.Rect(self.XPos,self.YPos,self.Width,self.Height) #Creates rectangle for the button
+            self.Text = text
+            self.Colour = 'white'
+        
+        def display_button(self):
+            screen.blit(self.Surface,self.Rect) #Displays the button's rectangle and surface to the screen
+            screen.blit(self.Text,(self.XPos +self.XOffset,self.YPos + self.YOffset)) #draws the button's text onto the screen, adjusted by the offset
+        
+        def update_button(self,MousePos):
+            self.Surface.fill('white') #By default the button is white
+            if self.Rect.collidepoint(MousePos): #If the button and mouse collide
+                self.Surface.fill('yellow') #The button is yellow
+                if pygame.mouse.get_pressed(num_buttons=3)[0]: #If the mouse's left click is pressed
+                    return True #Return true meaning the button was pressed
+                else:
+                    return False #Return False meaning the button was not pressed
+            else:
+                return False
+
+
+
+
+    
+    while running: #Repeated loop for the main menu
+        screen.fill((30,200,0)) 
+        title = title_font.render('Ai racer', False, (255,255,255)) #Displays the game's title on screen in white
+        screen.blit(title,(480,50))
+        
+        RaceButtonText = body_font.render('Start racing', False, (0,0,0)) #Creates black text to be displayed on the button
+        RaceButton = Button(200,50,530,250,RaceButtonText,52,15)
+        
+        SettingsButtonText = body_font.render('Settings', False, (0,0,0)) #Creates black text to be displayed on the button
+        SettingsButton = Button(200,50,530,450,SettingsButtonText,62,15)
+        
+        MousePos = pygame.mouse.get_pos() #Gets the mouse's position
+        if RaceButton.update_button(MousePos): #If button 1 was pressed
+            return 'R' #Returns R to begin the race
+        if SettingsButton.update_button(MousePos): #If button 2 was pressed
+            return 'S' #Returns S to go to settings
+        
+        for event in pygame.event.get(): #If the X button is pressed, the game closes
             if event.type == pygame.QUIT:
                 running = False
-            
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_r: #This means it was the s key
-                        running = False
-                        return 'R'
-                if event.key == pygame.K_s: #This means it was the s key
-                        running = False
-                        return 'S'
                 
-
+        RaceButton.display_button()
+        SettingsButton.display_button()
         pygame.display.update()
+    return 'Q'
 
 
 def settings():
-    screen.fill((10,200,0))
-    pygame.display.update()
+    class Button():
+        def __init__(self,width,height,x,y,text,XOffset,YOffset):
+            self.Width = width
+            self.Height = height
+            self.XPos = x
+            self.YPos = y
+            self.XOffset = XOffset
+            self.YOffset = YOffset
+
+            self.Surface = pygame.Surface((self.Width,self.Height)) #Creates surface for the button
+            self.Rect = pygame.Rect(self.XPos,self.YPos,self.Width,self.Height) #Creates rectangle for the button
+            self.Text = text
+            self.Colour = 'white'
+        
+        def display_button(self):
+            screen.blit(self.Surface,self.Rect) #Displays the button's rectangle and surface to the screen
+            screen.blit(self.Text,(self.XPos +self.XOffset,self.YPos + self.YOffset)) #draws the button's text onto the screen, adjusted by the offset
+        
+        def update_button(self,MousePos):
+            self.Surface.fill('white') #By default the button is white
+            if self.Rect.collidepoint(MousePos): #If the button and mouse collide
+                self.Surface.fill('yellow') #The button is yellow
+                if pygame.mouse.get_pressed(num_buttons=3)[0]: #If the mouse's left click is pressed
+                    return True #Return true meaning the button was pressed
+                else:
+                    return False #Return False meaning the button was not pressed
+            else:
+                return False
+
+
+
+    running = True
+    while running: #Repeated loop for the main menu
+        screen.fill((30,200,0)) 
+        title = title_font.render('Settings', False, (255,255,255)) #Displays the word settings on the top of the screen
+        screen.blit(title,(480,50))
+        
+        
+        LapsText = Medium_font.render('Total laps: ' + str(get_totalLaps()),False,(255,255,255))
+        screen.blit(LapsText,(480,120))
+
+        LapIncreaseButtonText = body_font.render('Increase number of laps', False, (0,0,0)) #Creates black text to be displayed on the button
+        LapIncreaseButton = Button(200,50,330,250,LapIncreaseButtonText,52,15)
+        
+        LapDecreaseButtonText = body_font.render('Increase number of laps', False, (0,0,0)) #Creates black text to be displayed on the button
+        LapDecreaseButton = Button(200,50,330,250,LapDecreaseButtonText,52,15)
+
+
+        MenuButtonText = body_font.render('Back to main menu', False, (0,0,0)) #Creates black text to be displayed on the button
+        SettingsButton = Button(200,50,530,450,MenuButtonText,62,15)
+        
+        MousePos = pygame.mouse.get_pos() #Gets the mouse's position
+        if LapIncreaseButton.update_button(MousePos): #If button 1 was pressed
+            if get_totalLaps() <10:
+                set_totalLaps(get_totalLaps + 1) 
+        if LapDecreaseButton.update_button(MousePos): #If button 1 was pressed
+            if get_totalLaps() >1:
+                set_totalLaps(get_totalLaps) - 1
+        if SettingsButton.update_button(MousePos): #If button 2 was pressed
+            return 'M' #Returns M to go to the main menu
+        
+        for event in pygame.event.get(): #If the X button is pressed, the game closes
+            if event.type == pygame.QUIT:
+                running = False
+                
+        LapIncreaseButton.display_button()
+        LapDecreaseButton.display_button()
+        SettingsButton.display_button()
+        pygame.display.update()
+    return 'Q'
 
 def results():
-    screen.fill((10,200,0))
-    pygame.display.update()
+    class Button():
+        def __init__(self,width,height,x,y,text,XOffset,YOffset):
+            self.Width = width
+            self.Height = height
+            self.XPos = x
+            self.YPos = y
+            self.XOffset = XOffset
+            self.YOffset = YOffset
+
+            self.Surface = pygame.Surface((self.Width,self.Height)) #Creates surface for the button
+            self.Rect = pygame.Rect(self.XPos,self.YPos,self.Width,self.Height) #Creates rectangle for the button
+            self.Text = text
+            self.Colour = 'white'
+        
+        def display_button(self):
+            screen.blit(self.Surface,self.Rect) #Displays the button's rectangle and surface to the screen
+            screen.blit(self.Text,(self.XPos +self.XOffset,self.YPos + self.YOffset)) #draws the button's text onto the screen, adjusted by the offset
+        
+        def update_button(self,MousePos):
+            self.Surface.fill('white') #By default the button is white
+            if self.Rect.collidepoint(MousePos): #If the button and mouse collide
+                self.Surface.fill('yellow') #The button is yellow
+                if pygame.mouse.get_pressed(num_buttons=3)[0]: #If the mouse's left click is pressed
+                    return True #Return true meaning the button was pressed
+                else:
+                    return False #Return False meaning the button was not pressed
+            else:
+                return False
+
+
+
+
+    running = True
+    while running:
+        screen.fill((10,200,0))
+        title = title_font.render('Race finish', False, (255,255,255)) #Displays the words 'Race finish' at the top of the screen
+        screen.blit(title,(480,50))
+            
+        RaceButtonText = body_font.render('New race', False, (0,0,0)) #Creates black text to be displayed on the button
+        RaceButton = Button(200,50,530,250,RaceButtonText,52,15)
+            
+        MenuButtonText = body_font.render('Main menu', False, (0,0,0)) #Creates black text to be displayed on the button
+        MenuButton = Button(200,50,530,450,MenuButtonText,62,15)
+            
+        MousePos = pygame.mouse.get_pos() #Gets the mouse's position
+        if RaceButton.update_button(MousePos): #If button 1 was pressed
+            return 'R' #Returns R to begin the race
+        if MenuButton.update_button(MousePos): #If button 2 was pressed
+            return 'M' #Returns M to go to the menu
+            
+        for event in pygame.event.get(): #If the X button is pressed, the game closes
+            if event.type == pygame.QUIT:
+                running = False
+                pygame.quit()
+                    
+        RaceButton.display_button()
+        MenuButton.display_button()
+        pygame.display.update()
+    return 'Q'
+            
 
 
 def game_loop():
@@ -176,7 +358,9 @@ def game_loop():
             self.LapCount += 1
             self.LastCheckpoint = 0
             if self.LapCount >= TotalLaps:
-                end_game(self)
+                print("Final lap done")
+                return 'O' #returns O meaning the game is over and the results screen should now be displayed
+            return 'C' #returns C meaning the game should continue
         
         def wrong_checkpoint(self):
             time.sleep(0)
@@ -282,23 +466,26 @@ def game_loop():
                 
     """Global subroutines start"""
 
-    def abs(number):
-        if number <0:
-            return number * -1
-        else:
-            return number
+    
         
     def checkpoint_reached(TheCar,CheckNo,TotalChecks):
-        if CheckNo == TheCar.get_checks() + 1:
-            if CheckNo == TotalChecks + 1:
-                TheCar.finished_lap(TotalLaps)
+        if CheckNo == TheCar.get_checks() + 1: #If the checkpoint is correct
+            if CheckNo == TotalChecks + 1: #If this is the finish line
+                result = TheCar.finished_lap(TotalLaps) #Run the finished lap subroutine
+                if result == 'O': #If the game is over
+                    print("checkpoint reached final round")
+                    return 'O'
+                else:
+                    return 'C'
             else:
-                TheCar.next_checkpoint()
+                TheCar.next_checkpoint() #If not the finish line then run next_checkpoint
+                return 'C'
         else:
-            TheCar.wrong_checkpoint()
+            TheCar.wrong_checkpoint() #If not the correct checkpoint then run next_checkpoint
+            return 'C'
 
-    def end_game(theCar):
-        print("w")
+    
+    
 
 
 
@@ -356,7 +543,6 @@ def game_loop():
     RotationAmount = 0.45
     StartTime = time.perf_counter()
     FrameRate = 0.0165000000
-    TotalLaps = 3 #This will become a player input later
     '''Variables only used to test the mean and standard deviation of time between frames
     count = 0
     total = 0
@@ -364,6 +550,8 @@ def game_loop():
     '''
     NormalFriction = 0.0095
     OffTrackFriction = 0.04
+
+
 
     '''Game loop'''
     while running: #Infinite loop to prevent the display window from closing until the user decides to
@@ -410,6 +598,7 @@ def game_loop():
         for event in pygame.event.get(): #event handling
             if event.type == pygame.QUIT:
                 running = False
+                pygame.quit()
             if event.type == pygame.KEYDOWN: # This means any key has been PRESSED
                 if event.key == pygame.K_a: #This means it was the a key
                     IsTurningLeft = True
@@ -466,11 +655,16 @@ def game_loop():
         if pygame.sprite.spritecollide(Finishline1, CarGroup, False):
             #Mask collision detection between the finish line and the car
             if pygame.sprite.spritecollide(Finishline1, CarGroup,False, pygame.sprite.collide_mask):
-                checkpoint_reached(Car1,TotalChecks + 1,TotalChecks)
+                result = checkpoint_reached(Car1,TotalChecks + 1,TotalChecks)
+                if result == 'O':
+                    print("going to results screen")
+                    return 'O'
 
         for i in range(TotalChecks): #Checks if any of the checkpoints have collided with the car
             if pygame.sprite.collide_rect(Car1,CheckArray[i]):
-                checkpoint_reached(Car1,i + 1,TotalChecks)
+                result = checkpoint_reached(Car1,i + 1,TotalChecks)
+                if result == 'O':
+                    return 'O'
             
 
         
@@ -487,20 +681,38 @@ def game_loop():
         pygame.display.update()
         
     '''End game loop'''
+    return 'Q'
 
 '''Code to test the mean and standard deviation of the time between frames
 
 print("\n\nMean = ", total/count)
 print("Standard deviation = ",np.sqrt(sigmaXSquared/count - (total/count)**2))
 '''
-
-
 next_process = menu()
-if next_process == 'R':
-    game_loop()
-elif next_process == 'S':
-    settings()
-pygame.quit()
+running = True
 
+while running:
+    print(next_process)
+
+    if next_process == 'R':
+        print("Game loop")
+        next_process = game_loop()
+
+    elif next_process == 'S':
+        print("Settings")
+        next_process = settings()
+
+    elif next_process == 'O':
+        print("Results")
+        next_process = results()
+
+    elif next_process == 'M':
+        print("Menu")
+        next_process = menu()
+
+    elif next_process == 'Q':
+        running = False
+
+pygame.quit()
 
 
