@@ -13,7 +13,7 @@ body_font = pygame.font.SysFont('Aptos', 25)
 Medium_font = pygame.font.SysFont('Aptos', 65)
 screen = pygame.display.set_mode((1243, 800)) #Creates a display window with 800 horizontal pixels and 600 vertical pixels
 TotalLaps = 1 #This will become a player input later
-
+LastButtonPress = 0 #Is set equal to the current time using the system's clock
 
 #Customising pygame window
 pygame.display.set_caption("Ai racer")
@@ -32,7 +32,15 @@ def abs(number):
 def get_totalLaps():
         return TotalLaps
 def set_totalLaps(newValue):
+    global TotalLaps
     TotalLaps = newValue
+
+def get_LastButtonPress(): #returns the last time a button was pressed
+    return LastButtonPress
+
+def update_LastButtonPress(): #sets the last time a button was pressed to the current time
+    global LastButtonPress
+    LastButtonPress = time.perf_counter()
 
 '''global subroutines end'''
 def menu():
@@ -60,11 +68,13 @@ def menu():
             if self.Rect.collidepoint(MousePos): #If the button and mouse collide
                 self.Surface.fill('yellow') #The button is yellow
                 if pygame.mouse.get_pressed(num_buttons=3)[0]: #If the mouse's left click is pressed
-                    return True #Return true meaning the button was pressed
-                else:
-                    return False #Return False meaning the button was not pressed
-            else:
-                return False
+                    if time.perf_counter() > get_LastButtonPress() + 0.6000000000:
+                        update_LastButtonPress()
+                        return True #Return true meaning the button was pressed
+                    
+                        
+            
+            return False #Return False meaning the button was not pressed
 
 
 
@@ -94,7 +104,7 @@ def menu():
         RaceButton.display_button()
         SettingsButton.display_button()
         pygame.display.update()
-    return 'Q'
+    return 'Q' #returns Q to quit the game
 
 
 def settings():
@@ -121,11 +131,13 @@ def settings():
             if self.Rect.collidepoint(MousePos): #If the button and mouse collide
                 self.Surface.fill('yellow') #The button is yellow
                 if pygame.mouse.get_pressed(num_buttons=3)[0]: #If the mouse's left click is pressed
-                    return True #Return true meaning the button was pressed
-                else:
-                    return False #Return False meaning the button was not pressed
-            else:
-                return False
+                    if time.perf_counter() > get_LastButtonPress() + 0.6000000000:
+                        update_LastButtonPress()
+                        return True #Return true meaning the button was pressed
+                    
+                        
+            
+            return False #Return False meaning the button was not pressed
 
 
 
@@ -133,30 +145,30 @@ def settings():
     while running: #Repeated loop for the main menu
         screen.fill((30,200,0)) 
         title = title_font.render('Settings', False, (255,255,255)) #Displays the word settings on the top of the screen
-        screen.blit(title,(480,50))
+        screen.blit(title,(450,50))
         
         
         LapsText = Medium_font.render('Total laps: ' + str(get_totalLaps()),False,(255,255,255))
-        screen.blit(LapsText,(480,120))
+        screen.blit(LapsText,(480,170))
 
         LapIncreaseButtonText = body_font.render('Increase number of laps', False, (0,0,0)) #Creates black text to be displayed on the button
-        LapIncreaseButton = Button(200,50,330,250,LapIncreaseButtonText,52,15)
+        LapIncreaseButton = Button(200,50,330,250,LapIncreaseButtonText,0,15)
         
-        LapDecreaseButtonText = body_font.render('Increase number of laps', False, (0,0,0)) #Creates black text to be displayed on the button
-        LapDecreaseButton = Button(200,50,330,250,LapDecreaseButtonText,52,15)
+        LapDecreaseButtonText = body_font.render('Decrease number of laps', False, (0,0,0)) #Creates black text to be displayed on the button
+        LapDecreaseButton = Button(200,50,730,250,LapDecreaseButtonText,0,15)
 
 
         MenuButtonText = body_font.render('Back to main menu', False, (0,0,0)) #Creates black text to be displayed on the button
-        SettingsButton = Button(200,50,530,450,MenuButtonText,62,15)
+        MenuButton = Button(200,50,530,650,MenuButtonText,0,15)
         
         MousePos = pygame.mouse.get_pos() #Gets the mouse's position
-        if LapIncreaseButton.update_button(MousePos): #If button 1 was pressed
+        if LapIncreaseButton.update_button(MousePos): #If the lap increase button was pressed
             if get_totalLaps() <10:
-                set_totalLaps(get_totalLaps + 1) 
-        if LapDecreaseButton.update_button(MousePos): #If button 1 was pressed
+                set_totalLaps(get_totalLaps() + 1) 
+        if LapDecreaseButton.update_button(MousePos): #If the lap decrease button was pressed
             if get_totalLaps() >1:
-                set_totalLaps(get_totalLaps) - 1
-        if SettingsButton.update_button(MousePos): #If button 2 was pressed
+                set_totalLaps(get_totalLaps() - 1) 
+        if MenuButton.update_button(MousePos): #If the menu button was pressed
             return 'M' #Returns M to go to the main menu
         
         for event in pygame.event.get(): #If the X button is pressed, the game closes
@@ -165,7 +177,7 @@ def settings():
                 
         LapIncreaseButton.display_button()
         LapDecreaseButton.display_button()
-        SettingsButton.display_button()
+        MenuButton.display_button()
         pygame.display.update()
     return 'Q'
 
@@ -193,11 +205,13 @@ def results():
             if self.Rect.collidepoint(MousePos): #If the button and mouse collide
                 self.Surface.fill('yellow') #The button is yellow
                 if pygame.mouse.get_pressed(num_buttons=3)[0]: #If the mouse's left click is pressed
-                    return True #Return true meaning the button was pressed
-                else:
-                    return False #Return False meaning the button was not pressed
-            else:
-                return False
+                    if time.perf_counter() > get_LastButtonPress() + 0.6000000000:
+                        update_LastButtonPress()
+                        return True #Return true meaning the button was pressed
+                    
+                        
+            
+            return False #Return False meaning the button was not pressed
 
 
 
@@ -205,7 +219,7 @@ def results():
     running = True
     while running:
         screen.fill((10,200,0))
-        title = title_font.render('Race finish', False, (255,255,255)) #Displays the words 'Race finish' at the top of the screen
+        title = title_font.render('Race Finish!!', False, (255,255,255)) #Displays the words 'Race finish' at the top of the screen
         screen.blit(title,(480,50))
             
         RaceButtonText = body_font.render('New race', False, (0,0,0)) #Creates black text to be displayed on the button
@@ -290,6 +304,9 @@ def game_loop():
         
         def get_checks(self):
             return self.LastCheckpoint
+        
+        def get_laps(self):
+            return self.LapCount
 
 
         def set_image(self, image):
@@ -675,6 +692,9 @@ def game_loop():
         Finishline1.display_FinishLine()
         #for i in range(TotalChecks): #displays every checkpoint on the screen (for testing)
         #    CheckArray[i].display_checkpoint()
+
+        LapsText = Medium_font.render('Lap ' + str(Car1.get_laps()) + "/" + str(get_totalLaps()),False,(255,255,255))
+        screen.blit(LapsText,(0,0))
         
         
         
