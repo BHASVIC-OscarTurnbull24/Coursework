@@ -8,12 +8,16 @@ import time
 
 pygame.init() #Initialises pygame so its functionality can be used
 pygame.font.init()
-title_font = pygame.font.SysFont('Aptos', 120)
+title_font = pygame.font.SysFont('Aptos', 140)
 body_font = pygame.font.SysFont('Aptos', 25)
-Medium_font = pygame.font.SysFont('Aptos', 65)
+Medium_font = pygame.font.SysFont('Aptos', 63)
 screen = pygame.display.set_mode((1243, 800)) #Creates a display window with 800 horizontal pixels and 600 vertical pixels
 TotalLaps = 1 #This will become a player input later
 LastButtonPress = 0 #Is set equal to the current time using the system's clock
+DisplayCheckpoints = False
+IsSinglePlayer = True #True for single player, False for 2 player
+LastResult = [0.0,0] #Array holding the time taken for the last game and the player who won
+
 
 #Customising pygame window
 pygame.display.set_caption("Ai racer")
@@ -41,6 +45,31 @@ def get_LastButtonPress(): #returns the last time a button was pressed
 def update_LastButtonPress(): #sets the last time a button was pressed to the current time
     global LastButtonPress
     LastButtonPress = time.perf_counter()
+
+def switch_DisplayCheckpoints():
+    global DisplayCheckpoints
+    DisplayCheckpoints = not DisplayCheckpoints #Toggles the checkpoints from being displayed on screen to not
+
+def get_DisplayCheckpoints(): #getter for the display checkpoints variable
+    global DisplayCheckpoints
+    return DisplayCheckpoints
+
+def switch_GameMode():
+    global IsSinglePlayer
+    IsSinglePlayer = not IsSinglePlayer #Toggles the game modr from 1 players to 2 players.
+
+def get_GameMode(): #getter for the IsSinglePlayer variable
+    global IsSinglePlayer
+    return IsSinglePlayer
+
+def set_results(TimeTaken, Winner):
+    global LastResult
+    LastResult = [TimeTaken,Winner]
+    
+def get_results():
+    global LastResult
+    return LastResult
+
 
 '''global subroutines end'''
 def menu():
@@ -79,17 +108,21 @@ def menu():
 
 
 
-    
+    CarImage = pygame.image.load('racecar.png')
+    CarImage = pygame.Surface.convert_alpha(CarImage)
     while running: #Repeated loop for the main menu
         screen.fill((30,200,0)) 
-        title = title_font.render('Ai racer', False, (255,255,255)) #Displays the game's title on screen in white
-        screen.blit(title,(480,50))
+        title = title_font.render('AI Racer', False, (255,255,255)) #Displays the game's title on screen in white
+        screen.blit(title,(450,60))
         
         RaceButtonText = body_font.render('Start racing', False, (0,0,0)) #Creates black text to be displayed on the button
-        RaceButton = Button(200,50,530,250,RaceButtonText,52,15)
+        RaceButton = Button(200,50,530,450,RaceButtonText,52,15)
         
         SettingsButtonText = body_font.render('Settings', False, (0,0,0)) #Creates black text to be displayed on the button
-        SettingsButton = Button(200,50,530,450,SettingsButtonText,62,15)
+        SettingsButton = Button(200,50,530,650,SettingsButtonText,62,15)
+
+        screen.blit(CarImage,(380,70))
+        screen.blit(CarImage,(880,70))
         
         MousePos = pygame.mouse.get_pos() #Gets the mouse's position
         if RaceButton.update_button(MousePos): #If button 1 was pressed
@@ -145,21 +178,40 @@ def settings():
     while running: #Repeated loop for the main menu
         screen.fill((30,200,0)) 
         title = title_font.render('Settings', False, (255,255,255)) #Displays the word settings on the top of the screen
-        screen.blit(title,(450,50))
+        screen.blit(title,(450,20))
         
         
         LapsText = Medium_font.render('Total laps: ' + str(get_totalLaps()),False,(255,255,255))
-        screen.blit(LapsText,(480,170))
+        screen.blit(LapsText,(480,120))
+
+        if get_DisplayCheckpoints():
+            DisplayCheckpointText = Medium_font.render('CheckPoints are being displayed',False,(255,255,255))
+            screen.blit(DisplayCheckpointText,(250,280))
+        else:
+            DisplayCheckpointText = Medium_font.render('CheckPoints are not being displayed',False,(255,255,255))
+            screen.blit(DisplayCheckpointText,(250,280))
+
+        if get_GameMode():
+            GameModeText = Medium_font.render('1 player is selected',False,(255,255,255))
+            screen.blit(GameModeText,(440,450))
+        else:
+            DisplayCheckpointText = Medium_font.render('2 players are selected',False,(255,255,255))
+            screen.blit(DisplayCheckpointText,(440,450))
 
         LapIncreaseButtonText = body_font.render('Increase number of laps', False, (0,0,0)) #Creates black text to be displayed on the button
-        LapIncreaseButton = Button(200,50,330,250,LapIncreaseButtonText,0,15)
+        LapIncreaseButton = Button(200,50,330,200,LapIncreaseButtonText,0,15)
         
         LapDecreaseButtonText = body_font.render('Decrease number of laps', False, (0,0,0)) #Creates black text to be displayed on the button
-        LapDecreaseButton = Button(200,50,730,250,LapDecreaseButtonText,0,15)
+        LapDecreaseButton = Button(200,50,730,200,LapDecreaseButtonText,0,15)
 
+        ToggleCheckpointDisplayButtonText = body_font.render('Toggle checkpoint display', False, (0,0,0)) #Creates black text to be displayed on the button
+        ToggleCheckpointDisplayButton = Button(230,50,530,350,ToggleCheckpointDisplayButtonText,0,15)
+
+        ToggleGameModeButtonText = body_font.render('Toggle 1/2 players', False, (0,0,0)) #Creates black text to be displayed on the button
+        ToggleGameModeButton = Button(200,50,540,550,ToggleGameModeButtonText,0,15)
 
         MenuButtonText = body_font.render('Back to main menu', False, (0,0,0)) #Creates black text to be displayed on the button
-        MenuButton = Button(200,50,530,650,MenuButtonText,0,15)
+        MenuButton = Button(200,50,540,700,MenuButtonText,0,15)
         
         MousePos = pygame.mouse.get_pos() #Gets the mouse's position
         if LapIncreaseButton.update_button(MousePos): #If the lap increase button was pressed
@@ -168,6 +220,12 @@ def settings():
         if LapDecreaseButton.update_button(MousePos): #If the lap decrease button was pressed
             if get_totalLaps() >1:
                 set_totalLaps(get_totalLaps() - 1) 
+        if ToggleCheckpointDisplayButton.update_button(MousePos): 
+            switch_DisplayCheckpoints()
+
+        if ToggleGameModeButton.update_button(MousePos): 
+            switch_GameMode()
+
         if MenuButton.update_button(MousePos): #If the menu button was pressed
             return 'M' #Returns M to go to the main menu
         
@@ -177,6 +235,8 @@ def settings():
                 
         LapIncreaseButton.display_button()
         LapDecreaseButton.display_button()
+        ToggleCheckpointDisplayButton.display_button()
+        ToggleGameModeButton.display_button()
         MenuButton.display_button()
         pygame.display.update()
     return 'Q'
@@ -219,14 +279,22 @@ def results():
     running = True
     while running:
         screen.fill((10,200,0))
-        title = title_font.render('Race Finish!!', False, (255,255,255)) #Displays the words 'Race finish' at the top of the screen
-        screen.blit(title,(480,50))
+        title = title_font.render('Race Finish!', False, (255,255,255)) #Displays the words 'Race finish' at the top of the screen
+        screen.blit(title,(450,50))
+
+        PlayerWon = Medium_font.render('Player ' + str(get_results()[1]) + ' won!', False, (255,255,255)) #Displays which player won the game
+        screen.blit(PlayerWon,(450,250))
+
+        TimeLaps = Medium_font.render('It took ' + str(get_results()[0]) + ' seconds to beat ' + str(get_totalLaps()) + ' laps', False, (255,255,255)) #Displays the time taken and how many laps were raced
+        screen.blit(TimeLaps,(300,350))
+
+
             
         RaceButtonText = body_font.render('New race', False, (0,0,0)) #Creates black text to be displayed on the button
-        RaceButton = Button(200,50,530,250,RaceButtonText,52,15)
+        RaceButton = Button(200,50,530,450,RaceButtonText,52,15)
             
         MenuButtonText = body_font.render('Main menu', False, (0,0,0)) #Creates black text to be displayed on the button
-        MenuButton = Button(200,50,530,450,MenuButtonText,62,15)
+        MenuButton = Button(200,50,530,650,MenuButtonText,62,15)
             
         MousePos = pygame.mouse.get_pos() #Gets the mouse's position
         if RaceButton.update_button(MousePos): #If button 1 was pressed
@@ -255,21 +323,27 @@ def game_loop():
 
     class Car(pygame.sprite.Sprite):
 
-        def __init__(self,XPos,YPos,Rotation,CarImage):
+        def __init__(self,XPos,YPos,Rotation,CarImage,PlayerNo):
             pygame.sprite.Sprite.__init__(self)
-            self.XPos = XPos
+            self.XPos = XPos    
             self.YPos = YPos
             self.Rotation = Rotation
-            self.XSpeed = 0
+            self.XSpeed = 0 #Sets speeds to 0 as the car is initially not moving
             self.YSpeed = 0
             self.ResultantSpeed = 0
-            self.CarImage = pygame.Surface.convert_alpha(CarImage)
+            self.CarImage = pygame.Surface.convert_alpha(CarImage) #Makes it so pixels can be transparent
             self.DisplayCarImage = self.CarImage
             self.rect = self.DisplayCarImage.get_rect()
             self.rect.topleft = (self.XPos,self.YPos)
             self.mask = pygame.mask.from_surface(self.DisplayCarImage)
             self.LapCount = 0
             self.LastCheckpoint = 0
+            self.PlayerNo = PlayerNo #Number of the player, 1 for player 1, 2 for player 2 etc
+            self.IsGoingUp = False
+            self.IsGoingDown = False
+            self.IsTurningLeft = False
+            self.IsTurningRight = False
+            self.Friction = 0.0095
 
 
 
@@ -307,10 +381,46 @@ def game_loop():
         
         def get_laps(self):
             return self.LapCount
+        
+        def get_PlayerNo(self):
+            return self.PlayerNo
+        
+        def get_IsGoingUp(self): #Getter for if the car is going up
+            return self.IsGoingUp
+
+        def get_IsGoingDown(self): #Getter for if the car is going down
+            return self.IsGoingDown
+
+        def get_IsTurningLeft(self): #Getter for if the car is turning left
+            return self.IsTurningLeft
+
+        def get_IsTurningRight(self): #Getter for if the car is turning right
+            return self.IsTurningRight
+        
+        def get_Friction(self): #Getter for the friction of the car
+            return self.Friction
+        
+        def set_Friction(self,NewValue): #Setter for the friction of the car
+            self.Friction = NewValue
 
 
         def set_image(self, image):
             self.DisplayCarImage = image
+
+
+        def set_IsGoingUp(self,NewValue): #Setter for if the car is going up
+            self.IsGoingUp = NewValue
+
+        def set_IsGoingDown(self,NewValue): #Setter for if the car is going down
+            self.IsGoingDown = NewValue
+
+        def set_IsTurningLeft(self,NewValue): #Setter for if the car is turning left
+            self.IsTurningLeft = NewValue
+
+        def set_IsTurningRight(self,NewValue): #Setter for if the car is turning right
+            self.IsTurningRight = NewValue
+
+        
 
         def set_speed(self,ResultantSpeed): #This method takes in a new resultant speed as a parameter and updates the ResultantSpeed attribute and then calulates the correct X and Y speeds based off the rotation
             self.ResultantSpeed = ResultantSpeed
@@ -381,6 +491,8 @@ def game_loop():
         
         def wrong_checkpoint(self):
             time.sleep(0)
+
+        
             
         
 
@@ -481,7 +593,7 @@ def game_loop():
 
     """ End class definitions"""
                 
-    """Global subroutines start"""
+    """Subroutines start"""
 
     
         
@@ -508,10 +620,13 @@ def game_loop():
 
 
 
-    """ Global subroutines end"""
+    """ Subroutines end"""
 
     #Instantiating the car and racetrack objects
-    Car1 = Car(210,500,0,CarImage)
+    Car1 = Car(240,540,0,CarImage,1)
+    if not get_GameMode():
+        Car2 = Car(180,500,0,CarImage,2)
+
     Track1 = Track("TEMP racetrack.png", 100,100)
     Finishline1 = FinishLine("finishline.png", 159,400)
     #Instantiating all of the checkpoints
@@ -542,8 +657,14 @@ def game_loop():
 
 
     #Creating Sprite groups
-    CarGroup = pygame.sprite.Group()
-    CarGroup.add(Car1)
+    Car1Group = pygame.sprite.Group()
+    Car1Group.add(Car1)
+
+    if not get_GameMode():
+        Car2Group = pygame.sprite.Group()
+        Car2Group.add(Car2)
+
+
 
 
 
@@ -551,11 +672,6 @@ def game_loop():
     #Definitions of global variables used in the game
 
     running = True
-    IsGoingUp = False
-    IsGoingDown = False
-    IsTurningLeft = False
-    IsTurningRight = False
-    Friction = 0.0095
     Acceleration = 0.055
     RotationAmount = 0.45
     StartTime = time.perf_counter()
@@ -567,6 +683,7 @@ def game_loop():
     '''
     NormalFriction = 0.0095
     OffTrackFriction = 0.04
+    TimerStart = time.perf_counter()
 
 
 
@@ -596,105 +713,157 @@ def game_loop():
         
         #print(StartTime)
         
+        def car_processing(TheCar,CarGroup):
+            global running
+            if not TheCar.get_IsGoingUp() or not TheCar.get_IsGoingDown(): #If both IsGoingUp and IsGoingDown are true, then the speed remains the same
+                if TheCar.get_IsGoingUp():
+                    TheCar.set_speed((TheCar.get_ResultantSpeed() + Acceleration + 0.00003 * TheCar.get_ResultantSpeed()))
+                elif TheCar.get_IsGoingDown():
+                    TheCar.set_speed((TheCar.get_ResultantSpeed() - Acceleration - 0.00003 * TheCar.get_ResultantSpeed()))
 
-        if not IsGoingUp or not IsGoingDown: #If both IsGoingUp and IsGoingDown are true, then the speed remains the same
-            if IsGoingUp:
-                Car1.set_speed((Car1.get_ResultantSpeed() + Acceleration + 0.00003 * Car1.get_ResultantSpeed()))
-            elif IsGoingDown:
-                Car1.set_speed((Car1.get_ResultantSpeed() - Acceleration - 0.00003 * Car1.get_ResultantSpeed()))
-
-        if not IsTurningLeft or not IsTurningRight:#If both IsTurningLeft and IsTurningRight are true, then the angle remains the same
-            if IsTurningLeft:
-                Car1.set_image(Car1.rotate_car(-RotationAmount *Car1.get_ResultantSpeed(), Car1.get_image())) 
-            elif IsTurningRight:
-                Car1.set_image(Car1.rotate_car(RotationAmount *Car1.get_ResultantSpeed(), Car1.get_image())) 
-            
-
-
-
-        for event in pygame.event.get(): #event handling
-            if event.type == pygame.QUIT:
-                running = False
-                pygame.quit()
-            if event.type == pygame.KEYDOWN: # This means any key has been PRESSED
-                if event.key == pygame.K_a: #This means it was the a key
-                    IsTurningLeft = True
-
-                if event.key == pygame.K_d: #This means it was the d key
-                    IsTurningRight = True
-
-                if event.key == pygame.K_w: #This means it was the w key
-                    IsGoingUp = True
-
-                if event.key == pygame.K_s: #This means it was the s key
-                    IsGoingDown = True
-
+            if not TheCar.get_IsTurningLeft() or not TheCar.get_IsTurningRight():#If both IsTurningLeft and IsTurningRight are true, then the angle remains the same
+                if TheCar.get_IsTurningLeft():
+                    TheCar.set_image(TheCar.rotate_car(-RotationAmount *TheCar.get_ResultantSpeed(), TheCar.get_image())) 
+                elif TheCar.get_IsTurningRight():
+                    TheCar.set_image(TheCar.rotate_car(RotationAmount *TheCar.get_ResultantSpeed(), TheCar.get_image())) 
                 
 
-            if event.type == pygame.KEYUP: # This means any key has been LET GO OF
-                if event.key == pygame.K_a: #This means it was the a key
-                    IsTurningLeft = False
 
-                if event.key == pygame.K_d: #This means it was the d key
-                    IsTurningRight = False
+            
+            for event in pygame.event.get(): #event handling
+                if event.type == pygame.QUIT:
+                    running = False
+                    pygame.quit()
+                if event.type == pygame.KEYDOWN: # This means any key has been PRESSED
+                    if event.key == pygame.K_a: #This means it was the a key
+                        Car1.set_IsTurningLeft(True)
 
-                if event.key == pygame.K_w: #This means it was the w key
-                    IsGoingUp = False
+                    if event.key == pygame.K_d: #This means it was the d key
+                        Car1.set_IsTurningRight(True)
 
-                if event.key == pygame.K_s: #This means it was the s key
-                    IsGoingDown = False
+                    if event.key == pygame.K_w: #This means it was the w key
+                        Car1.set_IsGoingUp(True) 
+
+                    if event.key == pygame.K_s: #This means it was the s key
+                        Car1.set_IsGoingDown(True)
+                
+                    if event.key == pygame.K_LEFT: #This means it was the a key
+                        Car2.set_IsTurningLeft(True)
+
+                    if event.key == pygame.K_RIGHT: #This means it was the d key
+                        Car2.set_IsTurningRight(True)
+
+                    if event.key == pygame.K_UP: #This means it was the w key
+                        Car2.set_IsGoingUp(True) 
+
+                    if event.key == pygame.K_DOWN: #This means it was the s key
+                        Car2.set_IsGoingDown(True)
 
 
-            #end event handling
+                    
 
-        #Adding frictional forces to the car's speed
-        if Car1.get_ResultantSpeed() != 0:
-            Car1.set_speed(Car1.get_ResultantSpeed() - Friction *Car1.get_ResultantSpeed())
-        
+                if event.type == pygame.KEYUP: # This means any key has been LET GO OF
+                    if event.key == pygame.K_a: #This means it was the a key
+                        Car1.set_IsTurningLeft(False)
+
+                    if event.key == pygame.K_d: #This means it was the d key
+                        Car1.set_IsTurningRight(False)
+                    if event.key == pygame.K_w: #This means it was the w key
+                        Car1.set_IsGoingUp(False)
+                    if event.key == pygame.K_s: #This means it was the s key
+                        Car1.set_IsGoingDown(False)
+                    if event.key == pygame.K_LEFT: #This means it was the left key
+                        Car2.set_IsTurningLeft(False)
+                    if event.key == pygame.K_RIGHT: #This means it was the right key
+                        Car2.set_IsTurningRight(False)
+                    if event.key == pygame.K_UP: #This means it was the up key
+                        Car2.set_IsGoingUp(False)
+                    if event.key == pygame.K_DOWN: #This means it was the down key
+                        Car2.set_IsGoingDown(False)
 
 
-        screen.fill((10,200,0))
-        Car1.move_car()
+
+                #end event handling
+
+            #Adding frictional forces to the car's speed
+            if TheCar.get_ResultantSpeed() != 0:
+                TheCar.set_speed(TheCar.get_ResultantSpeed() - TheCar.get_Friction() *TheCar.get_ResultantSpeed())
+            
 
 
-        #Rectangle collision detection between the track and the car
-        if pygame.sprite.spritecollide(Track1, CarGroup, False):
-            #Mask collision detection between the track and the car
-            if pygame.sprite.spritecollide(Track1, CarGroup,False, pygame.sprite.collide_mask):
-                Friction = NormalFriction 
+            screen.fill((10,200,0))
+            TheCar.move_car()
+
+
+            #Rectangle collision detection between the track and the car
+            if pygame.sprite.spritecollide(Track1, CarGroup, False):
+                #Mask collision detection between the track and the car
+                if pygame.sprite.spritecollide(Track1, CarGroup,False, pygame.sprite.collide_mask):
+                    TheCar.set_Friction(NormalFriction)
+                else:
+                    TheCar.set_Friction(OffTrackFriction)     
+
             else:
-                Friction = OffTrackFriction     
+                TheCar.set_Friction(OffTrackFriction)     
 
-        else:
-            Friction = OffTrackFriction
+            #Rectangle collision detection between the finish line and the car
+            if pygame.sprite.spritecollide(Finishline1, CarGroup, False):
+                #Mask collision detection between the finish line and the car
+                if pygame.sprite.spritecollide(Finishline1, CarGroup,False, pygame.sprite.collide_mask):
+                    result = checkpoint_reached(TheCar,TotalChecks + 1,TotalChecks)
+                    if result == 'O':
+                        set_results(round(NewTime-TimerStart,3),TheCar.get_PlayerNo())
+                        return 'O'
 
-        #Rectangle collision detection between the finish line and the car
-        if pygame.sprite.spritecollide(Finishline1, CarGroup, False):
-            #Mask collision detection between the finish line and the car
-            if pygame.sprite.spritecollide(Finishline1, CarGroup,False, pygame.sprite.collide_mask):
-                result = checkpoint_reached(Car1,TotalChecks + 1,TotalChecks)
-                if result == 'O':
-                    print("going to results screen")
-                    return 'O'
-
-        for i in range(TotalChecks): #Checks if any of the checkpoints have collided with the car
-            if pygame.sprite.collide_rect(Car1,CheckArray[i]):
-                result = checkpoint_reached(Car1,i + 1,TotalChecks)
-                if result == 'O':
-                    return 'O'
+            for i in range(TotalChecks): #Checks if any of the checkpoints have collided with the car
+                if pygame.sprite.collide_rect(TheCar,CheckArray[i]):
+                    result = checkpoint_reached(TheCar,i + 1,TotalChecks)
+                    if result == 'O':
+                        set_results(round(NewTime-TimerStart,3),TheCar.get_PlayerNo())
+                        return 'O'
+            
+            
+            
             
 
         
+        if car_processing(Car1,Car1Group) == 'O':
+            return 'O'
         
+        if not get_GameMode():
+            if car_processing(Car2,Car2Group) == 'O':
+                return 'O'
         
+        #Displaying objects onto screen
         Track1.display_track()
         Car1.display_car()
-        Finishline1.display_FinishLine()
-        #for i in range(TotalChecks): #displays every checkpoint on the screen (for testing)
-        #    CheckArray[i].display_checkpoint()
+        if not get_GameMode():
+            Car2.display_car()
 
-        LapsText = Medium_font.render('Lap ' + str(Car1.get_laps()) + "/" + str(get_totalLaps()),False,(255,255,255))
-        screen.blit(LapsText,(0,0))
+
+        Finishline1.display_FinishLine()
+
+
+
+
+        
+        LapsText1 = Medium_font.render('Lap ' + str(Car1.get_laps()) + "/" + str(get_totalLaps()),False,(255,255,255)) #Displays the completed laps out of the total laps on screen
+        screen.blit(LapsText1,(3,0)) #Displays the text in the top left of the screen  
+        if not get_GameMode():
+            LapsText2 = Medium_font.render('Lap ' + str(Car2.get_laps()) + "/" + str(get_totalLaps()),False,(255,255,255)) #Displays the completed laps out of the total laps on screen
+            screen.blit(LapsText2,(260,0)) #Displays the text in the top left of the screen
+        
+        
+        if DisplayCheckpoints:
+            for i in range(TotalChecks): #Displays every checkpoint on the screen so that the user can understand their positions
+                CheckArray[i].display_checkpoint()
+
+        
+
+        TimerDisplay = round(time.perf_counter() - TimerStart,3) #Finds the difference between the current time and the time that the game started and rounds it to 1 millisecond
+        TimerText = Medium_font.render('Timer: ' + str(TimerDisplay),False,(255,255,255)) #Displays the text of the timer on the screen
+        screen.blit(TimerText,(960,0)) #Displays the timer in the top right of the screen
+
         
         
         
@@ -712,22 +881,22 @@ next_process = menu()
 running = True
 
 while running:
-    print(next_process)
+    #print(next_process)
 
     if next_process == 'R':
-        print("Game loop")
+        #print("Game loop")
         next_process = game_loop()
 
     elif next_process == 'S':
-        print("Settings")
+        #print("Settings")
         next_process = settings()
 
     elif next_process == 'O':
-        print("Results")
+        #print("Results")
         next_process = results()
 
     elif next_process == 'M':
-        print("Menu")
+        #print("Menu")
         next_process = menu()
 
     elif next_process == 'Q':
