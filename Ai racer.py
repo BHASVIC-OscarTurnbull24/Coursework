@@ -6,11 +6,14 @@ import time
 #Global objects and variables
 
 
+
+# Medium_font
+
 pygame.init() #Initialises pygame so its functionality can be used
 pygame.font.init()
 title_font = pygame.font.SysFont('Aptos', 140)
 body_font = pygame.font.SysFont('Aptos', 25)
-Medium_font = pygame.font.SysFont('Aptos', 63)
+medium_font = pygame.font.SysFont('Aptos', 63)
 screen = pygame.display.set_mode((1243, 800)) #Creates a display window with 800 horizontal pixels and 600 vertical pixels
 TotalLaps = 1 #This will become a player input later
 LastButtonPress = 0 #Is set equal to the current time using the system's clock
@@ -181,21 +184,21 @@ def settings():
         screen.blit(title,(450,20))
         
         
-        LapsText = Medium_font.render('Total laps: ' + str(get_totalLaps()),False,(255,255,255))
+        LapsText = medium_font.render('Total laps: ' + str(get_totalLaps()),False,(255,255,255))
         screen.blit(LapsText,(480,120))
 
         if get_DisplayCheckpoints():
-            DisplayCheckpointText = Medium_font.render('CheckPoints are being displayed',False,(255,255,255))
+            DisplayCheckpointText = medium_font.render('CheckPoints are being displayed',False,(255,255,255))
             screen.blit(DisplayCheckpointText,(250,280))
         else:
-            DisplayCheckpointText = Medium_font.render('CheckPoints are not being displayed',False,(255,255,255))
+            DisplayCheckpointText = medium_font.render('CheckPoints are not being displayed',False,(255,255,255))
             screen.blit(DisplayCheckpointText,(250,280))
 
         if get_GameMode():
-            GameModeText = Medium_font.render('1 player is selected',False,(255,255,255))
+            GameModeText = medium_font.render('1 player is selected',False,(255,255,255))
             screen.blit(GameModeText,(440,450))
         else:
-            DisplayCheckpointText = Medium_font.render('2 players are selected',False,(255,255,255))
+            DisplayCheckpointText = medium_font.render('2 players are selected',False,(255,255,255))
             screen.blit(DisplayCheckpointText,(440,450))
 
         LapIncreaseButtonText = body_font.render('Increase number of laps', False, (0,0,0)) #Creates black text to be displayed on the button
@@ -282,10 +285,10 @@ def results():
         title = title_font.render('Race Finish!', False, (255,255,255)) #Displays the words 'Race finish' at the top of the screen
         screen.blit(title,(450,50))
 
-        PlayerWon = Medium_font.render('Player ' + str(get_results()[1]) + ' won!', False, (255,255,255)) #Displays which player won the game
+        PlayerWon = medium_font.render('Player ' + str(get_results()[1]) + ' won!', False, (255,255,255)) #Displays which player won the game
         screen.blit(PlayerWon,(450,250))
 
-        TimeLaps = Medium_font.render('It took ' + str(get_results()[0]) + ' seconds to beat ' + str(get_totalLaps()) + ' laps', False, (255,255,255)) #Displays the time taken and how many laps were raced
+        TimeLaps = medium_font.render('It took ' + str(get_results()[0]) + ' seconds to beat ' + str(get_totalLaps()) + ' laps', False, (255,255,255)) #Displays the time taken and how many laps were raced
         screen.blit(TimeLaps,(300,350))
 
 
@@ -555,9 +558,9 @@ def game_loop():
         
     class CheckPoint:
         def __init__(self,x,y,rotation,width,CheckNo):
-            self.image = pygame.Surface.convert_alpha(pygame.image.load("Checkpoint.png"))
-            self.image = pygame.transform.scale(self.image,(width,1))
-            self.image = pygame.transform.rotate(self.image,rotation)
+            self.CheckpointImage = pygame.Surface.convert_alpha(pygame.image.load("Checkpoint.png"))
+            self.CheckpointImage = pygame.transform.scale(self.CheckpointImage,(width,1))
+            self.CheckpointImage = pygame.transform.rotate(self.CheckpointImage,rotation)
             self.XPos = x
             self.YPos = y
             self.rect = self.image.get_rect()
@@ -573,7 +576,7 @@ def game_loop():
             return self.mask
         
         def get_image(self): #Getter for the image of the checkpoint
-            return self.image
+            return self.CheckpointImage
 
         def get_XPos(self): #Getter for the mask of the checkpoint
             return self.XPos
@@ -582,7 +585,7 @@ def game_loop():
             return self.YPos   
         
         def display_checkpoint(self): #Method to display the checkpointto the screen
-            screen.blit(self.image,(self.XPos,self.YPos))
+            screen.blit(self.CheckpointImage,(self.XPos,self.YPos))
 
 
         
@@ -847,10 +850,10 @@ def game_loop():
 
 
         
-        LapsText1 = Medium_font.render('Lap ' + str(Car1.get_laps()) + "/" + str(get_totalLaps()),False,(255,255,255)) #Displays the completed laps out of the total laps on screen
+        LapsText1 = medium_font.render('Lap ' + str(Car1.get_laps()) + "/" + str(get_totalLaps()),False,(255,255,255)) #Displays the completed laps out of the total laps on screen
         screen.blit(LapsText1,(3,0)) #Displays the text in the top left of the screen  
         if not get_GameMode():
-            LapsText2 = Medium_font.render('Lap ' + str(Car2.get_laps()) + "/" + str(get_totalLaps()),False,(255,255,255)) #Displays the completed laps out of the total laps on screen
+            LapsText2 = medium_font.render('Lap ' + str(Car2.get_laps()) + "/" + str(get_totalLaps()),False,(255,255,255)) #Displays the completed laps out of the total laps on screen
             screen.blit(LapsText2,(260,0)) #Displays the text in the top left of the screen
         
         
@@ -861,7 +864,7 @@ def game_loop():
         
 
         TimerDisplay = round(time.perf_counter() - TimerStart,3) #Finds the difference between the current time and the time that the game started and rounds it to 1 millisecond
-        TimerText = Medium_font.render('Timer: ' + str(TimerDisplay),False,(255,255,255)) #Displays the text of the timer on the screen
+        TimerText = medium_font.render('Timer: ' + str(TimerDisplay),False,(255,255,255)) #Displays the text of the timer on the screen
         screen.blit(TimerText,(960,0)) #Displays the timer in the top right of the screen
 
         
@@ -877,29 +880,29 @@ def game_loop():
 print("\n\nMean = ", total/count)
 print("Standard deviation = ",np.sqrt(sigmaXSquared/count - (total/count)**2))
 '''
-next_process = menu()
+NextProcess = menu()
 running = True
 
 while running:
     #print(next_process)
 
-    if next_process == 'R':
+    if NextProcess == 'R':
         #print("Game loop")
-        next_process = game_loop()
+        NextProcess = game_loop()
 
-    elif next_process == 'S':
+    elif NextProcess == 'S':
         #print("Settings")
-        next_process = settings()
+        NextProcess = settings()
 
-    elif next_process == 'O':
+    elif NextProcess == 'O':
         #print("Results")
-        next_process = results()
+        NextProcess = results()
 
-    elif next_process == 'M':
+    elif NextProcess == 'M':
         #print("Menu")
-        next_process = menu()
+        NextProcess = menu()
 
-    elif next_process == 'Q':
+    elif NextProcess == 'Q':
         running = False
 
 pygame.quit()
