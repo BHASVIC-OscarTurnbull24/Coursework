@@ -563,9 +563,9 @@ def game_loop():
             self.CheckpointImage = pygame.transform.rotate(self.CheckpointImage,rotation)
             self.XPos = x
             self.YPos = y
-            self.rect = self.image.get_rect()
+            self.rect = self.CheckpointImage.get_rect()
             self.rect.topleft = (self.XPos,self.YPos)
-            self.mask = pygame.mask.from_surface(self.image)
+            self.mask = pygame.mask.from_surface(self.CheckpointImage)
             self.CheckNo = CheckNo
 
 
@@ -613,9 +613,20 @@ def game_loop():
                 TheCar.next_checkpoint() #If not the finish line then run next_checkpoint
                 return 'C'
         else:
-            TheCar.wrong_checkpoint() #If not the correct checkpoint then run next_checkpoint
+            TheCar.wrong_checkpoint() #If not the correct checkpoint then run wrong_checkpoint
             return 'C'
 
+
+    '''
+    def checkpoint_reached(TheCar,CheckNo,TotalChecks):
+        if CheckNo == TheCar.get_checks() + 1: #If the checkpoint is correct
+            if CheckNo == TotalChecks + 1: #If this is the finish line
+                TheCar.finished_lap(TotalLaps)
+            else:
+                TheCar.next_checkpoint() #If not the finish line then run next_checkpoint 
+        else:
+            TheCar.wrong_checkpoint() #If not the correct checkpoint then run wrong_checkpoint
+    '''
     
     
 
@@ -908,3 +919,4 @@ while running:
 pygame.quit()
 
 
+#image
