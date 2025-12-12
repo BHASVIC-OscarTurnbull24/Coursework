@@ -30,15 +30,16 @@ pygame.display.set_icon(icon)
 
 
 '''Global subroutines'''
-def abs(number):
+def abs(number): #returns the magnitude of a number
         if number <0:
             return number * -1
         else:
             return number
         
-def get_totalLaps():
+def get_totalLaps(): #returns the total number of laps allowed to be completed in a single game
         return TotalLaps
-def set_totalLaps(newValue):
+
+def set_totalLaps(newValue): #sets the total number of laps allowed to be completed in a single game to a parameter
     global TotalLaps
     TotalLaps = newValue
 
@@ -65,11 +66,11 @@ def get_GameMode(): #getter for the IsSinglePlayer variable
     global IsSinglePlayer
     return IsSinglePlayer
 
-def set_results(TimeTaken, Winner):
+def set_results(TimeTaken, Winner): #sets the LastResult array to new values of the time taken and the winner
     global LastResult
     LastResult = [TimeTaken,Winner]
     
-def get_results():
+def get_results(): #gets the global LastResult array
     global LastResult
     return LastResult
 
@@ -77,7 +78,7 @@ def get_results():
 '''global subroutines end'''
 def menu():
     running = True
-    class Button():
+    class Button(): #Class for the on screen buttons which can be pressed
         def __init__(self,width,height,x,y,text,XOffset,YOffset):
             self.Width = width
             self.Height = height
@@ -144,7 +145,7 @@ def menu():
 
 
 def settings():
-    class Button():
+    class Button():#Class for the on screen buttons which can be pressed
         def __init__(self,width,height,x,y,text,XOffset,YOffset):
             self.Width = width
             self.Height = height
@@ -245,7 +246,7 @@ def settings():
     return 'Q'
 
 def results():
-    class Button():
+    class Button():#Class for the on screen buttons which can be pressed
         def __init__(self,width,height,x,y,text,XOffset,YOffset):
             self.Width = width
             self.Height = height
