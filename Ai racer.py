@@ -6,11 +6,8 @@ import time
 #Global objects and variables
 
 
-
-# Medium_font
-
 pygame.init() #Initialises pygame so its functionality can be used
-pygame.font.init()
+pygame.font.init() #Creating fonts to be displayed on screen
 title_font = pygame.font.SysFont('Aptos', 140)
 body_font = pygame.font.SysFont('Aptos', 25)
 medium_font = pygame.font.SysFont('Aptos', 63)
