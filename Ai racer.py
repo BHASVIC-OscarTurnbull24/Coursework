@@ -340,11 +340,11 @@ def game_loop():
             self.LapCount = 0
             self.LastCheckpoint = 0
             self.PlayerNo = PlayerNo #Number of the player, 1 for player 1, 2 for player 2 etc
-            self.IsGoingUp = False
-            self.IsGoingDown = False
-            self.IsTurningLeft = False
-            self.IsTurningRight = False
-            self.Friction = 0.0095
+            self.IsGoingUp = False #Boolean to store if the car is currently moving up
+            self.IsGoingDown = False #Boolean to store if the car is currently moving down
+            self.IsTurningLeft = False #Boolean to store if the car is currently turning left
+            self.IsTurningRight = False #Boolean to store if the car is currently turning right
+            self.Friction = 0.0095 #Value of friction being applied on this specific car
 
 
 
